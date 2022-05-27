@@ -4,10 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.Request;
@@ -21,31 +26,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
+import java.net.URL;
+
 public class AddBookActivity extends AppCompatActivity {
-    private Button button_addbook_find;
-    private Button button_addbook_add;
-    private EditText input_ISBN;
+
     private String isbn;
     private String address = "https://api.jike.xyz/situ/book/isbn/";
     private String apikey = "?apikey=12718.2336c4d830e490842883539cad5a9668.d596f160ca12154d2fa00b1aef5c9045";
-    private TextView name;
-    private TextView author;
-    private TextView publish;
-    private TextView year;
-    private TextView error;
-
+    private ImageView image;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_addbook);
-        button_addbook_find=findViewById(R.id.button_addbook_find);
-        button_addbook_add=findViewById(R.id.button_addbook_add);
-        input_ISBN=findViewById(R.id.input_ISBN);
-        name=findViewById(R.id.text_bookname_result);
-        author=findViewById(R.id.text_author_result);
-        publish=findViewById(R.id.text_publish_result);
-        year=findViewById(R.id.text_publishyear_result);
+        TextView error=findViewById(R.id.error);
+        Button button_addbook_find=findViewById(R.id.button_addbook_find);
+        Button button_addbook_add=findViewById(R.id.button_addbook_add);
+        EditText input_ISBN=findViewById(R.id.input_ISBN);
+        TextView name=findViewById(R.id.text_bookname_result);
+        TextView author=findViewById(R.id.text_author_result);
+        TextView publish=findViewById(R.id.text_publish_result);
+        TextView year=findViewById(R.id.text_publishyear_result);
+        image = findViewById(R.id.image);
+        image.setImageResource(R.drawable.ivy);
+
         button_addbook_find.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -66,9 +71,8 @@ public class AddBookActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                         try {
-                            error.setText(response.getString("msg"));
+                            error.setText(response.getString("msg")+" !");
                             name.setText(context.getString("name"));
                             author.setText(context.getString("author"));
                             publish.setText(context.getString("publishing"));
@@ -77,14 +81,17 @@ public class AddBookActivity extends AppCompatActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+                        try {
+                            new ImageDownloadTask().execute(context.getString("photoUrl"));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }, new Response.ErrorListener(){
                     @Override
                     public void onErrorResponse(VolleyError error) {
-
                         System.out.println("发生了一个错误！");
                         error.printStackTrace();
-
                     }
                 });
                 queues.add(jsonObjectRequest);
@@ -100,17 +107,27 @@ public class AddBookActivity extends AppCompatActivity {
 
     }
 
-//
-//    public RequestQueue getRequestQueue(){
-//        if (queues == null) {
-//            queues = Volley.newRequestQueue(getApplicationContext());
-//        }
-//        return queues;
-//    }
-//
-//    private void addToRequestQueue(JsonObjectRequest jsonObjectRequest) {
-//        getRequestQueue().add(jsonObjectRequest);
-//    }
+    private class ImageDownloadTask extends AsyncTask<String, Void, Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String url = params[0];
+            try {
+                URL imageUrl = new URL(url);
+                InputStream is = imageUrl.openConnection().getInputStream();
+                Bitmap imageBitmap = BitmapFactory.decodeStream(is);
+                return imageBitmap;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            if (result != null) {
+                image.setImageBitmap(result);
+            }
+        }
+    }
 
 
 }

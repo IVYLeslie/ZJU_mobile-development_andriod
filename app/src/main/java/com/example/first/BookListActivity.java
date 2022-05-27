@@ -14,7 +14,7 @@ public class BookListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_booklist);
         mRecyclerView = findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mRecyclerView.setAdapter(new NormalRecyclerViewAdapter(this));
+        //mRecyclerView.setAdapter(new NormalRecyclerViewAdapter(this));
 
     }
 }
