@@ -12,6 +12,8 @@
         android:layout_marginStart="6dp"
         android:layout_marginEnd="4dp"
         android:text="添加书籍"
+        android:textColor="@color/white"
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_find"
@@ -25,6 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="查看藏书"
+        android:textColor="@color/white"
         app:layout_constraintBaseline_toBaselineOf="@+id/button_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/button_add" />
